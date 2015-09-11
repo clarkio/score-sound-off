@@ -33,5 +33,5 @@ function getNFLGames() {
         {id: 14, homeTeamName: 'Team13', awayTeamName: 'Team28', homeTeamScore: 25, awayTeamScore: 7, active: false},
         {id: 15, homeTeamName: 'Team14', awayTeamName: 'Team29', homeTeamScore: 25, awayTeamScore: 7, active: false},
         {id: 16, homeTeamName: 'Team15', awayTeamName: 'Team30', homeTeamScore: 25, awayTeamScore: 7, active: false}
-    ]
+    ];
 }

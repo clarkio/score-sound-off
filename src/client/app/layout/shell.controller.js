@@ -21,13 +21,13 @@
         activate();
 
         function activate() {
-            logger.success(config.appTitle + ' loaded!', null);
             dataservice.retrieveNFLGames()
                 .then(success)
                 .catch(fail);
         }
         
         function success() {
+            logger.success(config.appTitle + ' loaded!', null);
             console.log('Finished retrieving NFL games!');
             hideSplash();
         }

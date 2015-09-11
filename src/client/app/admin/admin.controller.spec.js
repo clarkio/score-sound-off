@@ -12,7 +12,7 @@ describe('AdminController', function() {
         $rootScope.$apply();
     });
 
-    bard.verifyNoOutstandingHttpRequests();
+    // bard.verifyNoOutstandingHttpRequests();
 
     describe('Admin controller', function() {
         it('should be created successfully', function () {

@@ -12,7 +12,7 @@ describe('dashboard routes', function () {
             $templateCache.put(view, '');
         });
 
-        bard.verifyNoOutstandingHttpRequests();
+        // bard.verifyNoOutstandingHttpRequests();
 
         it('should map state dashboard to url / ', function() {
             expect($state.href('dashboard', {})).to.equal('/');

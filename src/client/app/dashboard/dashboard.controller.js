@@ -39,7 +39,7 @@
         function retrieveActiveGamesCount() {
             return dataservice.retrieveActiveGamesCount().then(function (data) {
                 vm.activeGamesCount = data;
-                if(data === 1) {
+                if (data === 1) {
                     vm.activeGamesText = 'Active Game';
                 }
                 return vm.activeGamesCount;
@@ -48,7 +48,7 @@
         
         function updateActiveGamesText() {
             vm.activeGamesCount = dataservice.totalNFLActiveGamesCount;
-            if(vm.activeGamesCount === 1) {
+            if (vm.activeGamesCount === 1) {
                 vm.activeGamesText = 'Active Game';
             } else {
                 vm.activeGamesText = 'Active Games';
