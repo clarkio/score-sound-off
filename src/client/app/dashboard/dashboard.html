@@ -1,0 +1,53 @@
+<section id="dashboard-view" class="mainbar">
+    <section class="matter">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <ul class="today-datas">
+                        <li class="borange">
+                            <div class="pull-left"><i class="fa fa-envelope"></i></div>
+                            <div class="datas-text pull-right">
+                                <span class="bold">{{vm.activeGamesCount}}</span> {{vm.activeGamesText}}
+                            </div>
+                            <div class="clearfix"></div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="row"><div class="col-md-6">
+                    <div class="widget wblue">
+                        <div ht-widget-header title="NFL Games"
+                             allow-collapse="true"></div>
+                        <div class="widget-content text-center text-info">
+                            <table class="table table-condensed table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Home Team</th>
+                                        <th>Away Team</th>
+                                        <th>Home Team Score</th>
+                                        <th>Away Team Score</th>
+                                        <th>Active</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="g in vm.nflGames">
+                                        <td>{{g.homeTeamName}}</td>
+                                        <td>{{g.awayTeamName}}</td>
+                                        <td>{{g.homeTeamScore}}</td>
+                                        <td>{{g.awayTeamScore}}</td>
+                                        <td>{{g.active}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="widget-foot">
+                            <div class="clearfix">Last Update At:</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                </div>
+            </div>
+        </div>
+    </section>
+</section>
