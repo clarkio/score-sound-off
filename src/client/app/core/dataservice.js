@@ -30,11 +30,13 @@
                 .catch(fail);
                 
             function success(response) {
+                console.log(response.data);
                 service.totalNFLGamesCount = response.data.length;
                 service.totalNFLActiveGamesCount = response.data.reduce(function(n, game) {
-                    return n + (game.active === true);
+                    return n + (game.time.active === true);
                 }, 0);
                 service.nflGames = response.data;
+                console.log(service.nflGames);
                 return response.data;
             }
             

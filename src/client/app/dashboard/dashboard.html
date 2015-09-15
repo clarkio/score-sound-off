@@ -22,20 +22,22 @@
                             <table class="table table-condensed table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Home Team</th>
-                                        <th>Away Team</th>
-                                        <th>Home Team Score</th>
-                                        <th>Away Team Score</th>
-                                        <th>Active</th>
+                                        <th>Teams</th>
+                                        <th>Scores</th>
+                                        <th>Time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="g in vm.nflGames">
-                                        <td>{{g.homeTeamName}}</td>
-                                        <td>{{g.awayTeamName}}</td>
-                                        <td>{{g.homeTeamScore}}</td>
-                                        <td>{{g.awayTeamScore}}</td>
-                                        <td>{{g.active}}</td>
+                                        <tr>
+                                            <td>{{g.homeTeam.name}}</td>
+                                            <td>{{g.homeTeam.score}}</td>
+                                            <td>{{g.time.clock}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>{{g.awayTeam.name}}</td>
+                                            <td>{{g.awayTeam.score}}</td>
+                                        </tr>
                                     </tr>
                                 </tbody>
                             </table>

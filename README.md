@@ -1,6 +1,14 @@
 # score-sound-off
 
-**Generated from HotTowel Angular**
+An Angular/Node.js project for providing latest game scores and audible announcements of scoring events.
+
+>Generated from HotTowel Angular
+
+TODO:
+* Finish parsing the game data (using NFL for now)
+    - Note: completed games are displayed as `FINAL`, `END OF 4TH`, or `00:00 IN 4TH`
+    - Make sure to account for ties
+* Fix binding to response data in dashboard view
 
 >*Opinionated Angular style guide for teams by [@john_papa](//twitter.com/john_papa)*
 

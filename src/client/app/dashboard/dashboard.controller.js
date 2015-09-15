@@ -18,7 +18,7 @@
         vm.people = [];
         vm.title = 'Dashboard';
         vm.activeGamesText = 'Active Games';
-        vm.nflGames = {};
+        vm.nflGames = [];
 
         activate();
 
