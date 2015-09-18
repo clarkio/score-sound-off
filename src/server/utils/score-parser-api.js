@@ -62,7 +62,7 @@ function parseGameTime (data) {
         if (time.clock === 'FINAL' || time.clock === 'FINAL - OT' ||
             time.clock === '00:00 IN 4TH' || time.clock === 'END OF 4TH' || 
             time.clock === '00:00 IN OT' || time.clock === '00:00 IN 2OT') {
-                time.clock = 'FINAL';
+            time.clock = 'FINAL';
         }
         time.active = false;
     }

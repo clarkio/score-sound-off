@@ -55,6 +55,7 @@ function parseGameTime (data) {
     var time = {};
     
     time.clock = data.split('(').pop().split(')').shift();
+    // TODO: clean this mess up
     if (time.clock.indexOf('IN 1ST') > -1 || time.clock.indexOf('IN 2ND') > -1 || time.clock.indexOf('IN 3RD') > -1 ||
             (time.clock.indexOf('IN 4TH') > -1 && time.clock !== '00:00 IN 4TH')) {
         time.active = true;
