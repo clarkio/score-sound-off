@@ -1,7 +1,7 @@
 
 var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
-var scoreParser = require('./utils/score-parser');
+var scoreParser = require('./utils/score-parser-bottomline');
 
 var sports = {
     nfl: 'nfl',
@@ -15,6 +15,8 @@ module.exports = {
 
 var baseScoresUrl = 'http://sports.espn.go.com/';
 var trailingScoresUrl = '/bottomline/scores';
+// var baseScoresApiUrl = 'http://site.api.espn.com/apis/v2/scoreboard/';
+//http://site.api.espn.com/apis/v2/scoreboard/header?weeks=3&sport=football&league=nfl
 
 function retrieveSportsData(sport) {
     console.log('Sport Requested: ', sport);
@@ -22,6 +24,9 @@ function retrieveSportsData(sport) {
     return request(baseScoresUrl + sports.nfl + trailingScoresUrl)
                 .spread(readScoresData)
                 .catch(handleError);
+}
+
+function retrieveSportsDataFromApi (sport, week) {
 }
 
 function readScoresData (response, body) {

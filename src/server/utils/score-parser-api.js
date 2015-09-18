@@ -87,7 +87,7 @@ function parseTeam (data, isHomeTeam, isActive) {
         team.score = teamString.substring(teamString.length - 2);
     }
     
-    if (team.score && team.score > 0) {
+    if (team.score && team.score >= 0) {
         team.name = teamString.split(team.score)[0].trim().replace('^', '');
     } else {
         team.score = 0;

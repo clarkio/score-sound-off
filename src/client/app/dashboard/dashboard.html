@@ -29,15 +29,11 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="g in vm.nflGames">
-                                        <tr>
-                                            <td>{{g.homeTeam.name}}</td>
-                                            <td>{{g.homeTeam.score}}</td>
-                                            <td>{{g.time.clock}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td>{{g.awayTeam.name}}</td>
-                                            <td>{{g.awayTeam.score}}</td>
-                                        </tr>
+                                        <td>{{g.homeTeam.name}}</td>
+                                        <td>{{g.homeTeam.score}}</td>
+                                        <td>{{g.time.clock}}</td>
+                                        <td>{{g.awayTeam.name}}</td>
+                                        <td>{{g.awayTeam.score}}</td>
                                     </tr>
                                 </tbody>
                             </table>
