@@ -1,16 +1,28 @@
 
 var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
-var scoreParser = require('./utils/score-parser-bottomline');
+var bottomlineScoreParser = require('./utils/score-parser-bottomline');
+var apiScoreParser = require('./utils/score-parser-api');
 
-var sports = {
+var sport = {
+    football: 'football',
+    basketball: 'basketball',
+    hockey: 'hockey'
+};
+
+var leagues = {
     nfl: 'nfl',
-    ncf: 'ncf'
+    collegeFootball: 'ncf',
+    nhl: 'nhl',
+    nba: 'nba',
+    collegeBasketball: 'ncb'
 };
 
 module.exports = {
-    sports: sports,
-    retrieveSportsData: retrieveSportsData
+    sport: sport,
+    leagues: leagues,
+    retrieveSportsData: retrieveSportsDataFromBottomline,
+    testRetrieveSportsData: retrieveSportsDataFromApi
 };
 
 var useTestData = false;
@@ -19,22 +31,24 @@ var trailingScoresUrl = '/bottomline/scores';
 // var baseScoresApiUrl = 'http://site.api.espn.com/apis/v2/scoreboard/';
 //http://site.api.espn.com/apis/v2/scoreboard/header?weeks=3&sport=football&league=nfl
 
-function retrieveSportsData(sport) {
-    console.log('Sport Requested: ', sport);
+//http://site.api.espn.com/apis/v2/scoreboard/header?sport=football&league=nfl
+
+function retrieveSportsDataFromBottomline(sport) {
+    // console.log('Sport Requested: ', sport);
     if (useTestData) {
         return retrieveTestData();
     }
     // From Bluebird: if a module has multiple success values use .spread instead of .then
-    return request(baseScoresUrl + sports.nfl + trailingScoresUrl)
-                .spread(readScoresData)
+    return request(baseScoresUrl + leagues.nfl + trailingScoresUrl)
+                .spread(readBottomlineScoresData)
                 .catch(handleError);
 }
 
-function retrieveSportsDataFromApi (sport, week) {
+function retrieveSportsDataFromApi (sport, league) {
 }
 
-function readScoresData (response, body) {
-    var result = scoreParser.parseScores(body, sports.nfl);
+function readBottomlineScoresData (response, body) {
+    var result = bottomlineScoreParser.parseScores(body, leagues.nfl);
     return Promise.resolve(result);
 }
 
@@ -45,11 +59,18 @@ function handleError(e) {
 
 function retrieveTestData () {
     var fs = Promise.promisifyAll(require('fs'));
-    return fs.readFileAsync('src/client/test-helpers/test-data.txt', 'utf8')
+    return fs.readFileAsync('src/client/test-helpers/test-data-bottomline.txt', 'utf8')
         .then(function (data) {
-            return readScoresData({}, data.toString());
+            return readBottomlineScoresData({}, data.toString());
         })
         .catch(function (error) {
             return error;
         });
+    // return fs.readFileAsync('src/client/test-helpers/test-data-api.txt', 'utf8')
+    //     .then(function (data) {
+    //         return readScoresData({}, data.toString());
+    //     })
+    //     .catch(function (error) {
+    //         return error;
+    //     });
 }

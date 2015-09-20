@@ -8,80 +8,99 @@ module.exports = {
 
 function parseScores(data, sport) {
     return new Promise(function (resolve, reject) {
-        var rawGameItems = data.match(/left([^&;]+)/g);
-        cleanTheData(rawGameItems);
-        var parsedGames = parseIntoGames(rawGameItems);
+        var rawEventItems = data.match(/left([^&;]+)/g);
+        cleanTheData(rawEventItems);
+        var parsedEvents = parseIntoFootballEvents(rawEventItems);
         
-        resolve(parsedGames);
+        resolve(parsedEvents);
     });
 }
 
 function cleanTheData (array) {
     array.forEach(function (item, index) {
         // Game info starts after '=', clean up %20 between strings and add a | between teams
-        console.log('line item', item);
+        // console.log('line item', item);
         var replaceItem = '   ';
         if (item.indexOf('%20at%20') > -1) {
             replaceItem = ' at ';
         } else {
             replaceItem = '   ';
         }
-        console.log('replace item = ', replaceItem);
+        // console.log('replace item = ', replaceItem);
         array[index] = item.substring(item.indexOf('=') + 1).replace(/%20/g, ' ').replace(replaceItem, '|');
     });
 }
 
-function parseIntoGames (rawData) {
+function parseIntoFootballEvents (rawData) {
     var result = [];
     rawData.forEach(function (item, index) {
-        result.push(parseIntoGame(item));
+        result.push(parseIntoFootballEvent(item, index));
     });
     return result;
 }
 
-function parseIntoGame (data) {
-    var game = {};
+function parseIntoFootballEvent (data, index) {
+    var event = {};
     var homeTeamParse = true;
     var awayTeamParse = false;
-    console.log('raw game data:', data);
-    game.time = parseGameTime(data);
-    // console.log('parsed game time:', game.time);
-    game.homeTeam = parseTeam(data, homeTeamParse, game.time.active);
-    // console.log('parsed home team', game.homeTeam);
-    game.awayTeam = parseTeam(data, awayTeamParse);
-    // console.log('parsed away team', game.awayTeam);
     
-    if (!game.time.active) {
-        determineGameWinner(game);
-    }
+    event = parseFootballEventTime(data);
+    event.id = index + 1;
+    event.competitors = [];
+    event.competitors.push(parseCompetitor(data, homeTeamParse));
+    event.competitors.push(parseCompetitor(data, awayTeamParse));
     
-    return game;
+    determineEventWinner(event);
+    
+    return event;
 }
 
-function parseGameTime (data) {
-    var time = {};
+function parseFootballEventTime (data) {
+    var time = {
+        period: '',
+        clock: '',
+        status: '',
+        summary: ''
+    };
     
-    time.clock = data.split('(').pop().split(')').shift();
-    // TODO: clean this mess up
-    if (time.clock.indexOf('IN 1ST') > -1 || time.clock.indexOf('IN 2ND') > -1 || time.clock.indexOf('IN 3RD') > -1 ||
-            (time.clock.indexOf('IN 4TH') > -1 && time.clock !== '00:00 IN 4TH')) {
-        time.active = true;
-    } else {
-        if (time.clock === 'FINAL' || time.clock === 'FINAL - OT' ||
-            time.clock === '00:00 IN 4TH' || time.clock === 'END OF 4TH' || 
-            time.clock === '00:00 IN OT' || time.clock === '00:00 IN 2OT') {
-            
-            time.clock = 'FINAL';
+    var rawTimeData = data.split('(').pop().split(')').shift();
+    if (rawTimeData.indexOf('IN 1ST') > -1 || rawTimeData.indexOf('IN 2ND') > -1 || rawTimeData.indexOf('HALFTIME') > -1 ||
+            rawTimeData.indexOf('IN 3RD') > -1 || rawTimeData.indexOf('IN 4TH') > -1 && rawTimeData.indexOf('00:00 IN 4TH') < 0) {
+        console.log(rawTimeData);
+        time.status = 'in';
+        if (rawTimeData.indexOf('HALFTIME') > -1) {
+            time.period = '2';
+            time.clock = '0:00';
+        } else {
+            time.period = rawTimeData.substring(rawTimeData.length - 3, rawTimeData.length - 2);
+            time.clock = rawTimeData.substring(0, 5);
         }
-        time.active = false;
+        var summaryTense = determineSummaryTense(time.period);
+        time.summary = time.clock + ' - ' + time.period + summaryTense; 
+    } else if (rawTimeData.indexOf('FINAL') > -1 || rawTimeData === 'END OF 4TH' || 
+            rawTimeData === '00:00 IN OT' || rawTimeData === '00:00 IN 2OT' || rawTimeData.indexOf('00:00 IN 4TH') > -1) {
+        time.status = 'post';
+        time.period = '4';
+        time.clock = '0:00';
+        time.summary = 'Final';
+    } else {
+        time.status = 'pre';
+        time.period = '0';
+        time.clock = '0:00';
+        // rawTimeData should contain the time of the event in ET (ex: 8:30 PM ET)
+        time.summary = rawTimeData.replace('(','').replace(')','');
     }
     
     return time;
 }
 
-function parseTeam (data, isHomeTeam, isActive) {
-    var team = {};
-    var indexToTake = isHomeTeam ? 0 : 1;
+function parseCompetitor (data, isHomeTeam) {
+    var competitor = {};
+    competitor.id = '';
+    competitor.homeAway = isHomeTeam ? 'home' : 'away';
+    competitor.winner = false; // calculated later
+    
+    var indexToTake = isHomeTeam ? 1 : 0;
     var teamString = data.split('|');
     if (!teamString) {
         console.log('data does not contain |', data);
@@ -89,34 +108,57 @@ function parseTeam (data, isHomeTeam, isActive) {
         teamString = teamString[indexToTake];
     }
     
-    if (!isHomeTeam) {
-        console.log('teamString', teamString);
+    if (isHomeTeam) {
         teamString = teamString.split(' (')[0];
-        team.score = teamString.substring(teamString.length - 2);
+        competitor.score = teamString.substring(teamString.length - 2);
     } else {
-        team.score = teamString.substring(teamString.length - 2);
+        competitor.score = teamString.substring(teamString.length - 2);
     }
     
-    if (team.score && team.score >= 0) {
-        team.name = teamString.split(team.score)[0].trim().replace('^', '');
+    if (competitor.score && competitor.score >= 0) {
+        competitor.name = teamString.split(competitor.score)[0].trim().replace('^', '');
     } else {
-        team.score = 0;
-        team.name = teamString;
+        competitor.score = 0;
+        competitor.name = teamString;
     }
-    team.score = parseInt(team.score);
+    competitor.score = parseInt(competitor.score);
     
-    return team;
+    return competitor;
 }
 
-function determineGameWinner (game) {
-    if (game.homeTeam.score > game.awayTeam.score) {
-        game.homeTeam.isWinner = true;
-        game.awayTeam.isWinner = false;
-    } else if (game.homeTeam.score === game.awayTeam.score) {
-        game.homeTeam.isWinner = false;
-        game.awayTeam.isWinner = false;
+function determineEventWinner (event) {
+    if (event.competitors[0].score > event.competitors[1].score) {
+        event.competitors[0].winner = true;
+        event.competitors[1].winner = false;
+    } else if (event.competitors[0].score === event.competitors[1].score) {
+        event.competitors[0].winner = false;
+        event.competitors[1].winner = false;
     } else {
-        game.homeTeam.isWinner = false;
-        game.awayTeam.isWinner = true;
+        event.competitors[0].winner = false;
+        event.competitors[1].winner = true;
     }
+}
+
+function determineSummaryTense (period) {
+    var tense;
+    
+    switch (period) {
+        case '1':
+            tense = 'st';
+            break;
+        case '2':
+            tense = 'nd';
+            break;
+        case '3':
+            tense = 'rd';
+            break;
+        case '4':
+            tense = 'th';
+            break;
+        default:
+            tense = '';
+            break;
+    }
+    
+    return tense;
 }

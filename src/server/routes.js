@@ -18,6 +18,7 @@ function getPeople(req, res, next) {
 }
 
 function getNFLGames(req, res, next) {
+    scoresService.testRetrieveSportsData(scoresService.sport.football, scoresService.leagues.nfl);
     scoresService.retrieveSportsData('nfl')
         .then(function(result) {
             console.log('final result', result);

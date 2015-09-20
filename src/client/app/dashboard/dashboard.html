@@ -22,8 +22,10 @@
                             <table class="table table-condensed table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Teams</th>
-                                        <th>Scores</th>
+                                        <th>Home Team</th>
+                                        <th>Score</th>
+                                        <th>Away Team</th>
+                                        <th>Score</th>
                                         <th>Time</th>
                                     </tr>
                                 </thead>
@@ -31,9 +33,9 @@
                                     <tr ng-repeat="g in vm.nflGames">
                                         <td>{{g.homeTeam.name}}</td>
                                         <td>{{g.homeTeam.score}}</td>
-                                        <td>{{g.time.clock}}</td>
                                         <td>{{g.awayTeam.name}}</td>
                                         <td>{{g.awayTeam.score}}</td>
+                                        <td>{{g.time.clock}}</td>
                                     </tr>
                                 </tbody>
                             </table>
