@@ -13,7 +13,7 @@ module.exports = {
     retrieveSportsData: retrieveSportsData
 };
 
-var useTestData = true;
+var useTestData = false;
 var baseScoresUrl = 'http://sports.espn.go.com/';
 var trailingScoresUrl = '/bottomline/scores';
 // var baseScoresApiUrl = 'http://site.api.espn.com/apis/v2/scoreboard/';

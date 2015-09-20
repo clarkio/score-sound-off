@@ -19,10 +19,14 @@ function parseScores(data, sport) {
 function cleanTheData (array) {
     array.forEach(function (item, index) {
         // Game info starts after '=', clean up %20 between strings and add a | between teams
+        console.log('line item', item);
         var replaceItem = '   ';
-        if (item.indexOf('at') > -1) {
+        if (item.indexOf('%20at%20') > -1) {
             replaceItem = ' at ';
-        }   
+        } else {
+            replaceItem = '   ';
+        }
+        console.log('replace item = ', replaceItem);
         array[index] = item.substring(item.indexOf('=') + 1).replace(/%20/g, ' ').replace(replaceItem, '|');
     });
 }
@@ -39,10 +43,13 @@ function parseIntoGame (data) {
     var game = {};
     var homeTeamParse = true;
     var awayTeamParse = false;
-    
+    console.log('raw game data:', data);
     game.time = parseGameTime(data);
+    // console.log('parsed game time:', game.time);
     game.homeTeam = parseTeam(data, homeTeamParse, game.time.active);
+    // console.log('parsed home team', game.homeTeam);
     game.awayTeam = parseTeam(data, awayTeamParse);
+    // console.log('parsed away team', game.awayTeam);
     
     if (!game.time.active) {
         determineGameWinner(game);
@@ -83,6 +90,7 @@ function parseTeam (data, isHomeTeam, isActive) {
     }
     
     if (!isHomeTeam) {
+        console.log('teamString', teamString);
         teamString = teamString.split(' (')[0];
         team.score = teamString.substring(teamString.length - 2);
     } else {
