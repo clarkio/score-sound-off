@@ -2,6 +2,7 @@ var router = require('express').Router();
 var four0four = require('./utils/404')();
 var data = require('./data');
 var scoresService = require('./scores-service');
+var util = require('util');
 
 router.get('/people', getPeople);
 router.get('/person/:id', getPerson);
@@ -21,7 +22,7 @@ function getNFLGames(req, res, next) {
     scoresService.testRetrieveSportsData(scoresService.sport.football, scoresService.leagues.nfl);
     scoresService.retrieveSportsData('nfl')
         .then(function(result) {
-            console.log('final result', result);
+            console.log('final result', util.inspect(result, false, null));
             res.status(200).send(result);
         }).catch(function(error) {
             console.log('final error', error);

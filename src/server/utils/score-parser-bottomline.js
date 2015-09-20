@@ -64,21 +64,17 @@ function parseFootballEventTime (data) {
     };
     
     var rawTimeData = data.split('(').pop().split(')').shift();
-    if (rawTimeData.indexOf('IN 1ST') > -1 || rawTimeData.indexOf('IN 2ND') > -1 || rawTimeData.indexOf('HALFTIME') > -1 ||
-            rawTimeData.indexOf('IN 3RD') > -1 || rawTimeData.indexOf('IN 4TH') > -1 && rawTimeData.indexOf('00:00 IN 4TH') < 0) {
+    if (rawTimeData.indexOf('IN 1ST') > -1 || rawTimeData.indexOf('IN 2ND') > -1 || 
+            rawTimeData.indexOf('HALFTIME') > -1 || rawTimeData.indexOf('IN 3RD') > -1 || 
+            rawTimeData.indexOf('IN 4TH') > -1 && rawTimeData.indexOf('00:00 IN 4TH') < 0) {
         console.log(rawTimeData);
         time.status = 'in';
-        if (rawTimeData.indexOf('HALFTIME') > -1) {
-            time.period = '2';
-            time.clock = '0:00';
-        } else {
-            time.period = rawTimeData.substring(rawTimeData.length - 3, rawTimeData.length - 2);
-            time.clock = rawTimeData.substring(0, 5);
-        }
+        checkIfHalftimeFound(rawTimeData, time);
         var summaryTense = determineSummaryTense(time.period);
         time.summary = time.clock + ' - ' + time.period + summaryTense; 
     } else if (rawTimeData.indexOf('FINAL') > -1 || rawTimeData === 'END OF 4TH' || 
-            rawTimeData === '00:00 IN OT' || rawTimeData === '00:00 IN 2OT' || rawTimeData.indexOf('00:00 IN 4TH') > -1) {
+            rawTimeData === '00:00 IN OT' || rawTimeData === '00:00 IN 2OT' ||
+            rawTimeData.indexOf('00:00 IN 4TH') > -1) {
         time.status = 'post';
         time.period = '4';
         time.clock = '0:00';
@@ -127,15 +123,17 @@ function parseCompetitor (data, isHomeTeam) {
 }
 
 function determineEventWinner (event) {
-    if (event.competitors[0].score > event.competitors[1].score) {
-        event.competitors[0].winner = true;
-        event.competitors[1].winner = false;
-    } else if (event.competitors[0].score === event.competitors[1].score) {
-        event.competitors[0].winner = false;
-        event.competitors[1].winner = false;
-    } else {
-        event.competitors[0].winner = false;
-        event.competitors[1].winner = true;
+    if (event.status === 'post') {
+        if (event.competitors[0].score > event.competitors[1].score) {
+            event.competitors[0].winner = true;
+            event.competitors[1].winner = false;
+        } else if (event.competitors[0].score === event.competitors[1].score) {
+            event.competitors[0].winner = false;
+            event.competitors[1].winner = false;
+        } else {
+            event.competitors[0].winner = false;
+            event.competitors[1].winner = true;
+        }
     }
 }
 
@@ -161,4 +159,14 @@ function determineSummaryTense (period) {
     }
     
     return tense;
+}
+
+function checkIfHalftimeFound (rawTimeData, time) {
+    if (rawTimeData.indexOf('HALFTIME') > -1) {
+        time.period = '2';
+        time.clock = '0:00';
+    } else {
+        time.period = rawTimeData.substring(rawTimeData.length - 3, rawTimeData.length - 2);
+        time.clock = rawTimeData.substring(0, 5);
+    }
 }
