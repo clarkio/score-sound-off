@@ -18,6 +18,8 @@ var leagues = {
     collegeBasketball: 'ncb'
 };
 
+var nflEventData = {};
+
 module.exports = {
     sport: sport,
     leagues: leagues,
@@ -25,7 +27,7 @@ module.exports = {
     testRetrieveSportsData: retrieveSportsDataFromApi
 };
 
-var useTestData = false;
+var useTestData = true;
 var baseScoresUrl = 'http://sports.espn.go.com/';
 var trailingScoresUrl = '/bottomline/scores';
 // var baseScoresApiUrl = 'http://site.api.espn.com/apis/v2/scoreboard/';
@@ -49,6 +51,8 @@ function retrieveSportsDataFromApi (sport, league) {
 
 function readBottomlineScoresData (response, body) {
     var result = bottomlineScoreParser.parseScores(body, leagues.nfl);
+    nflEventData = result;
+    console.log(nflEventData);
     return Promise.resolve(result);
 }
 
@@ -59,7 +63,7 @@ function handleError(e) {
 
 function retrieveTestData () {
     var fs = Promise.promisifyAll(require('fs'));
-    return fs.readFileAsync('src/client/test-helpers/test-data-bottomline.txt', 'utf8')
+    return fs.readFileAsync('src/server/test-helpers/test-data-bottomline.txt', 'utf8')
         .then(function (data) {
             return readBottomlineScoresData({}, data.toString());
         })

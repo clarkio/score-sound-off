@@ -22,9 +22,9 @@
                             <table class="table table-condensed table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Home Team</th>
-                                        <th>Score</th>
                                         <th>Away Team</th>
+                                        <th>Score</th>
+                                        <th>Home Team</th>
                                         <th>Score</th>
                                         <th>Status</th>
                                         <!--<th>Quarter</th>-->
@@ -32,10 +32,10 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="g in vm.nflGames">
-                                        <td>{{g.competitors[0].name}}</td>
-                                        <td>{{g.competitors[0].score}}</td>
                                         <td>{{g.competitors[1].name}}</td>
                                         <td>{{g.competitors[1].score}}</td>
+                                        <td>{{g.competitors[0].name}}</td>
+                                        <td>{{g.competitors[0].score}}</td>
                                         <td>{{g.summary}}</td>
                                         <!--<td>{{g.clock}}</td>
                                         <td>{{g.period}}</td>-->
@@ -54,7 +54,9 @@
                             </table>
                         </div>
                         <div class="widget-foot">
-                            <div class="clearfix">Last Update At:</div>
+                            <button class="pull-right" ng-click="vm.updateNflScores()">Refresh</button>
+                            <!--<div class="clearfix">Last Update At:</div>-->
+                            <div class="clearfix"></div>
                         </div>
                     </div>
                 </div>

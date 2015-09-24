@@ -19,6 +19,7 @@
         vm.title = 'Dashboard';
         vm.activeGamesText = 'Active Games';
         vm.nflGames = [];
+        vm.updateNflScores = updateNflScores;
 
         activate();
 
@@ -57,6 +58,22 @@
         
         function updateNFLGamesCollection() {
             vm.nflGames = dataservice.nflGames;
+        }
+        
+        function updateNflScores () {
+            dataservice.retrieveNFLGames()
+                .then(successfullyRetrievedGames)
+                .catch(errorFunction);
+            
+            function successfullyRetrievedGames (result) {
+                vm.nflGames = result;
+                updateActiveGamesText();
+                retrieveActiveGamesCount();
+            }
+        }
+        
+        function errorFunction (error) {
+            console.log(error);
         }
     }
 })();
