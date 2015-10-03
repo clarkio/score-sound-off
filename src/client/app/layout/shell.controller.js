@@ -24,11 +24,14 @@
             dataservice.retrieveNFLGames()
                 .then(success)
                 .catch(fail);
+            // dataservice.retrieveNCFGames()
+            //     .then(success)
+            //     .catch(fail);
         }
         
         function success() {
             logger.success(config.appTitle + ' loaded!', null);
-            console.log('Finished retrieving NFL games!');
+            console.log('Finished retrieving games!');
             hideSplash();
         }
 

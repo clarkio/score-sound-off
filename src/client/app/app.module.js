@@ -6,7 +6,12 @@
         'app.widgets',
         'app.admin',
         'app.dashboard',
-        'app.layout'
-    ]);
+        'app.layout',
+        'btford.socket-io',
+        'angularMoment'
+    ]).
+    factory('nflSocket', function (socketFactory) {
+        return socketFactory();
+    });
 
 })();

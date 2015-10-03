@@ -5,23 +5,39 @@
         .module('app.dashboard')
         .controller('DashboardController', DashboardController);
 
-    DashboardController.$inject = ['$q', 'dataservice', 'logger', '$timeout'];
+    DashboardController.$inject = ['$q', 'dataservice', 'logger', '$timeout', 'nflSocket'];
     /* @ngInject */
-    function DashboardController($q, dataservice, logger, $timeout) {
+    function DashboardController($q, dataservice, logger, $timeout, nflSocket) {
         var vm = this;
         vm.news = {
             title: 'Score Sound Off',
             description: 'An announcer for sports games'
         };
         
-        vm.activeGamesCount = 0;
-        vm.people = [];
         vm.title = 'Dashboard';
-        vm.activeGamesText = 'Active Games';
+        vm.activeNflGamesCount = 0;
+        vm.activeNflGamesText = 'Active Games';
+        vm.activeNflGamesCount = 0;
+        vm.activeNflGamesText = 'Active Games';
         vm.nflGames = [];
+        vm.ncfGames = [];
         vm.updateNflScores = updateNflScores;
+        vm.updateNcfScores = updateNcfScores;
+        vm.lastUpdatedScoresTime = new Date();
 
         activate();
+        
+        nflSocket.on('NFL-ALL-UPDATE', function (data) {
+            vm.nflGames = data;
+            vm.lastUpdatedNflScoresTime = new Date();
+            console.log(data);
+        });
+        
+        nflSocket.on('NCF-ALL-UPDATE', function (data){
+            vm.ncfGames = data;
+            vm.lastUpdatedNcfScoresTime = new Date();
+            console.log('college games:', data);
+        });
 
         function activate() {
             //Hack for now to allow data service to retrieve games
@@ -29,12 +45,8 @@
                 logger.info('Activated Dashboard View');
                 updateActiveGamesText();
                 updateNFLGamesCollection();
-            }, 500);
-            
-            // var promises = [retrieveActiveGamesCount()];
-            // return $q.all(promises).then(function() {
-            //     logger.info('Activated Dashboard View');
-            // });
+                // updateNCFGamesCollection();
+            }, 1000);
         }
 
         function retrieveActiveGamesCount() {
@@ -48,16 +60,28 @@
         }
         
         function updateActiveGamesText() {
-            vm.activeGamesCount = dataservice.totalNFLActiveGamesCount;
-            if (vm.activeGamesCount === 1) {
-                vm.activeGamesText = 'Active Game';
+            vm.activeNflGamesCount = dataservice.totalNFLActiveGamesCount;
+            vm.activeNcfGamesCount = dataservice.totalNCFActiveGamesCount;
+            
+            if (vm.activeNflGamesCount === 1) {
+                vm.activeNflGamesText = 'Active NFL Game';
             } else {
-                vm.activeGamesText = 'Active Games';
+                vm.activeNflGamesText = 'Active NFL Games';
+            }
+            
+            if (vm.activeNcfGamesCount === 1) {
+                vm.activeNcfGamesText = 'Active College Football Game';
+            } else {
+                vm.activeNcfGamesText = 'Active College Football Games';
             }
         }
         
         function updateNFLGamesCollection() {
             vm.nflGames = dataservice.nflGames;
+        }
+        
+        function updateNCFGamesCollection() {
+            vm.ncfGames = dataservice.ncfGames;
         }
         
         function updateNflScores () {
@@ -67,6 +91,18 @@
             
             function successfullyRetrievedGames (result) {
                 vm.nflGames = result;
+                updateActiveGamesText();
+                retrieveActiveGamesCount();
+            }
+        }
+        
+        function updateNcfScores () {
+            dataservice.retrieveNCFGames()
+                .then(successfullyRetrievedGames)
+                .catch(errorFunction);
+            
+            function successfullyRetrievedGames (result) {
+                vm.ncfGames = result;
                 updateActiveGamesText();
                 retrieveActiveGamesCount();
             }

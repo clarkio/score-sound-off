@@ -67,7 +67,7 @@ function parseFootballEventTime (data) {
     if (rawTimeData.indexOf('IN 1ST') > -1 || rawTimeData.indexOf('IN 2ND') > -1 || 
             rawTimeData.indexOf('HALFTIME') > -1 || rawTimeData.indexOf('IN 3RD') > -1 || 
             rawTimeData.indexOf('IN 4TH') > -1 && rawTimeData.indexOf('00:00 IN 4TH') < 0) {
-        console.log(rawTimeData);
+        // console.log(rawTimeData);
         time.status = 'in';
         checkIfHalftimeFound(rawTimeData, time);
         var summaryTense = determineSummaryTense(time.period);

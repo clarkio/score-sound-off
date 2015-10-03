@@ -7,6 +7,7 @@ var util = require('util');
 router.get('/people', getPeople);
 router.get('/person/:id', getPerson);
 router.get('/nfl/games', getNFLGames);
+router.get('/ncf/games', getNCFGames);
 router.get('/nfl/games/:id', getNFLGame);
 router.get('/*', four0four.notFoundMiddleware);
 
@@ -19,16 +20,11 @@ function getPeople(req, res, next) {
 }
 
 function getNFLGames(req, res, next) {
-    scoresService.testRetrieveSportsData(scoresService.sport.football, scoresService.leagues.nfl);
-    scoresService.retrieveSportsData('nfl')
-        .then(function(result) {
-            console.log('final result', util.inspect(result, false, null));
-            res.status(200).send(result);
-        }).catch(function(error) {
-            console.log('final error', error);
-            res.status(500).send(error);
-        });
-    // res.status(200).send(result);
+    res.status(200).send(data.nflGameData);
+}
+
+function getNCFGames(req, res, next) {
+    res.status(200).send(data.ncfGameData);
 }
 
 function getPerson(req, res, next) {

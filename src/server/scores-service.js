@@ -3,6 +3,7 @@ var Promise = require('bluebird');
 var request = Promise.promisify(require('request'));
 var bottomlineScoreParser = require('./utils/score-parser-bottomline');
 var apiScoreParser = require('./utils/score-parser-api');
+var data = require('./data');
 
 var sport = {
     football: 'football',
@@ -19,12 +20,15 @@ var leagues = {
 };
 
 var nflEventData = {};
+var ncfEventData = {};
 
 module.exports = {
     sport: sport,
     leagues: leagues,
     retrieveSportsData: retrieveSportsDataFromBottomline,
-    testRetrieveSportsData: retrieveSportsDataFromApi
+    testRetrieveSportsData: retrieveSportsDataFromApi,
+    nflGames: nflEventData,
+    ncfGames: ncfEventData
 };
 
 var useTestData = true;
@@ -35,25 +39,45 @@ var trailingScoresUrl = '/bottomline/scores';
 
 //http://site.api.espn.com/apis/v2/scoreboard/header?sport=football&league=nfl
 
-function retrieveSportsDataFromBottomline(sport) {
+function getNflData () {
+    return Promise.resolve(nflEventData);
+}
+
+function retrieveSportsDataFromBottomline(sportType) {
     // console.log('Sport Requested: ', sport);
     if (useTestData) {
-        return retrieveTestData();
+        console.log('USING TEST DATA');
+        return retrieveTestData(sportType);
+    } else {
+        console.log('USING LIVE DATA');
     }
     // From Bluebird: if a module has multiple success values use .spread instead of .then
-    return request(baseScoresUrl + leagues.nfl + trailingScoresUrl)
+    return request(baseScoresUrl + sportType + trailingScoresUrl)
                 .spread(readBottomlineScoresData)
                 .catch(handleError);
+    
+    function readBottomlineScoresData (response, body) {
+        return bottomlineScoreParser.parseScores(body, leagues.nfl)
+                .then(function (result) {
+                    if (sportType === leagues.nfl) {
+                        nflEventData = result;
+                        data.nflGameData = result;
+                    } else {
+                        ncfEventData = result;
+                        data.ncfGameData = result;
+                    }
+                    // data.setNflGames(result);
+                    // console.log('Latest data:', nflEventData);
+                    return Promise.resolve(result);
+                })
+                .catch(function (error) {
+                    console.log('Error getting latest data:', error);
+                    return Promise.reject(error);
+                });
+    };
 }
 
 function retrieveSportsDataFromApi (sport, league) {
-}
-
-function readBottomlineScoresData (response, body) {
-    var result = bottomlineScoreParser.parseScores(body, leagues.nfl);
-    nflEventData = result;
-    console.log(nflEventData);
-    return Promise.resolve(result);
 }
 
 function handleError(e) {
@@ -61,20 +85,40 @@ function handleError(e) {
     return Promise.reject(e);
 }
 
-function retrieveTestData () {
+function retrieveTestData (sportType) {
     var fs = Promise.promisifyAll(require('fs'));
-    return fs.readFileAsync('src/server/test-helpers/test-data-bottomline.txt', 'utf8')
+    return fs.readFileAsync('src/server/test-helpers/test-data-bottomline.json', 'utf8')
         .then(function (data) {
-            return readBottomlineScoresData({}, data.toString());
+            data = JSON.parse(data);
+            return readBottomlineScoresData({}, data[sportType]);
         })
         .catch(function (error) {
+            console.log(error);
             return error;
         });
-    // return fs.readFileAsync('src/client/test-helpers/test-data-api.txt', 'utf8')
-    //     .then(function (data) {
-    //         return readScoresData({}, data.toString());
-    //     })
-    //     .catch(function (error) {
-    //         return error;
-    //     });
+        
+    function readBottomlineScoresData (response, body) {
+        return bottomlineScoreParser.parseScores(body, leagues.nfl)
+                .then(function (result) {
+                    if (sportType === leagues.nfl) {
+                        nflEventData = result;
+                        data.nflGameData = result;
+                    } else {
+                        ncfEventData = result;
+                        data.ncfGameData = result;
+                    }
+                    // data.setNflGames(result);
+                    // console.log('Latest data:', nflEventData);
+                    return Promise.resolve(result);
+                })
+                .catch(function (error) {
+                    console.log('Error getting latest data:', error);
+                    return Promise.reject(error);
+                });
+    };
+}
+
+function repeatUpdateOfScores() {
+    console.log('update in progress');
+    setInterval(retrieveSportsDataFromBottomline('nfl'), 5000);
 }
