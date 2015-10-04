@@ -78,7 +78,8 @@ function checkNcfScores () {
     //     scoresService.retrieveSportsData('ncf')
     //         .then(function (result) {
     //             io.emit('NCF-ALL-UPDATE', result);
-    //             console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': end update of NCF data', '\n----------');
+    //             console.log(moment()
+    //                  .format('MM-DD-YYYY h:mm:ss:SSS a') + ': end update of NCF data', '\n----------');
     //             if (endInterval) {
     //                 clearInterval(ncfScoresUpdateIntervalId);
     //             }

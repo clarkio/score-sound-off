@@ -40,7 +40,7 @@
                 service.totalNFLActiveGamesCount = response.data.reduce(function(n, game) {
                     return n + (game.status === 'in');
                 }, 0);
-                service.nflGames = response.data
+                service.nflGames = response.data;
                 return response.data;
             }
             

@@ -53,8 +53,8 @@ function getTeamScoreChangeAudioFile (scoreChange) {
     return result;
 }
 
-/*jshint -W074 */
 function getTeamNameAudioFile (teamCity) {
+    /*jshint maxcomplexity:33 */
     var teamName = '';
     var lowerCaseCityName = teamCity.toLowerCase();
     switch (lowerCaseCityName) {
@@ -160,4 +160,3 @@ function getTeamNameAudioFile (teamCity) {
     }
     return teamName;
 }
-/*jshint +W074 */

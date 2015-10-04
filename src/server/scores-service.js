@@ -73,7 +73,7 @@ function readBottomlineScoresData (response, body) {
     }
                     
     function errorFn (error) {
-        return handleError (error, 'Error getting latest data')
+        return handleError (error, 'Error getting latest data');
     }
 }
 
