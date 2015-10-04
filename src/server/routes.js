@@ -1,11 +1,8 @@
 var router = require('express').Router();
 var four0four = require('./utils/404')();
-var data = require('./data');
 var scoresService = require('./scores-service');
 var util = require('util');
 
-router.get('/people', getPeople);
-router.get('/person/:id', getPerson);
 router.get('/nfl/games', getNFLGames);
 router.get('/ncf/games', getNCFGames);
 router.get('/nfl/games/:id', getNFLGame);
@@ -15,29 +12,24 @@ module.exports = router;
 
 //////////////
 
-function getPeople(req, res, next) {
-    res.status(200).send(data.people);
-}
-
 function getNFLGames(req, res, next) {
-    res.status(200).send(data.nflGameData);
+    scoresService.retrieveSportsData('nfl')
+        .then(function (result) {
+            res.status(200).send(result);
+        })
+        .catch(function (error) {
+            res.status(500).send(error);
+        });
 }
 
 function getNCFGames(req, res, next) {
-    res.status(200).send(data.ncfGameData);
-}
-
-function getPerson(req, res, next) {
-    var id = +req.params.id;
-    var person = data.people.filter(function(p) {
-        return p.id === id;
-    })[0];
-
-    if (person) {
-        res.status(200).send(person);
-    } else {
-        four0four.send404(req, res, 'person ' + id + ' not found');
-    }
+    scoresService.retrieveSportsData('ncf')
+        .then(function (result) {
+            res.status(200).send(result);
+        })
+        .catch(function (error) {
+            res.status(500).send(error);
+        });
 }
 
 function getNFLGame(req, res, next) {
