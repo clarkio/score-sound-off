@@ -12,6 +12,8 @@ var logger = require('morgan');
 var moment = require('moment');
 var port = process.env.PORT || 8001;
 var four0four = require('./utils/404')();
+var scoreCalculator = require('./utils/score-calculator');
+var scoreAudio = require('./utils/score-audio');
 
 var environment = process.env.NODE_ENV;
 
@@ -21,26 +23,45 @@ app.use(bodyParser.json());
 app.use(logger('dev'));
 
 io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
-  });
+    socket.emit('news', {hello: 'world'});
+    socket.on('my other event', function (data) {
+        console.log(data);
+    });
 });
 
 app.use('/api', require('./routes'));
 
 var scoresService = require('./scores-service');
-var data = require('./data');
+var intervalInSeconds = 30;
 var endInterval = false;
+var gameData = [];
 
-scoresService.retrieveSportsData('nfl');
+var util = require('util');
+scoresService.retrieveSportsData('nfl')
+    .then(function (result) {
+        gameData = result;
+        console.log('Original game data', util.inspect(result, false, null));
+    });
 // scoresService.retrieveSportsData('ncf');
 
 var scoresUpdateIntervalId = setInterval(function () {
+    checkNflScores();
+}, intervalInSeconds * 1000);
+
+function checkNflScores () {
     console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': begin update of NFL data');
     scoresService.retrieveSportsData('nfl')
         .then(function (result) {
-            io.emit('NFL-ALL-UPDATE', result);
+            var scoreChanges = scoreCalculator.determineScoreChanges(gameData, result);
+            var scoreChangeAudio;
+            if (scoreChanges && scoreChanges.length > 0) {
+                gameData = result;
+                io.emit('NFL-ALL-UPDATE', result);
+                scoreChangeAudio = scoreAudio.determineScoreChangeAudio(scoreChanges);
+            }
+            if (scoreChangeAudio && scoreChangeAudio.length > 0) {
+                io.emit('NFL-SCORE-CHANGE', scoreChangeAudio);
+            }
             console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': end update of NFL data', '\n----------');
             if (endInterval) {
                 clearInterval(scoresUpdateIntervalId);
@@ -49,21 +70,24 @@ var scoresUpdateIntervalId = setInterval(function () {
         .catch(function (error) {
             console.log(error);
         });
-}, 10000);
-// var ncfScoresUpdateIntervalId = setInterval(function () {
-//     console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': begin update of NCF data');
-//     scoresService.retrieveSportsData('ncf')
-//         .then(function (result) {
-//             io.emit('NCF-ALL-UPDATE', result);
-//             console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': end update of NCF data', '\n----------');
-//             if (endInterval) {
-//                 clearInterval(ncfScoresUpdateIntervalId);
-//             }
-//         })
-//         .catch(function (error) {
-//             console.log(error);
-//         });
-// }, 10000);
+}
+
+function checkNcfScores () {
+    // var ncfScoresUpdateIntervalId = setInterval(function () {
+    //     console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': begin update of NCF data');
+    //     scoresService.retrieveSportsData('ncf')
+    //         .then(function (result) {
+    //             io.emit('NCF-ALL-UPDATE', result);
+    //             console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': end update of NCF data', '\n----------');
+    //             if (endInterval) {
+    //                 clearInterval(ncfScoresUpdateIntervalId);
+    //             }
+    //         })
+    //         .catch(function (error) {
+    //             console.log(error);
+    //         });
+    // }, 10000);
+}
 
 console.log('About to crank up node');
 console.log('PORT=' + port);
@@ -91,7 +115,8 @@ switch (environment){
         // });
         // Any deep link calls should return index.html
         // app.use('/*', express.static('./src/client/index.html'));
-        // app.use('/socket.io/*', express.static('./node_modules/socket.io/node_modules/socket.io-client/socket.io.js'))
+        // app.use('/socket.io/*', 
+        //     express.static('./node_modules/socket.io/node_modules/socket.io-client/socket.io.js'))
         break;
 }
 

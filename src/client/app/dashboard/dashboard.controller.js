@@ -1,3 +1,4 @@
+/* global angular */
 (function () {
     'use strict';
 
@@ -23,30 +24,60 @@
         vm.ncfGames = [];
         vm.updateNflScores = updateNflScores;
         vm.updateNcfScores = updateNcfScores;
-        vm.lastUpdatedScoresTime = new Date();
+        vm.lastUpdatedNflScoresTime = new Date();
+        vm.lastUpdatedNcfScoresTime = new Date();
 
         activate();
         
         nflSocket.on('NFL-ALL-UPDATE', function (data) {
             vm.nflGames = data;
             vm.lastUpdatedNflScoresTime = new Date();
-            console.log(data);
         });
         
-        nflSocket.on('NCF-ALL-UPDATE', function (data){
+        nflSocket.on('NCF-ALL-UPDATE', function (data) {
             vm.ncfGames = data;
             vm.lastUpdatedNcfScoresTime = new Date();
             console.log('college games:', data);
         });
+        
+        nflSocket.on('NFL-SCORE-CHANGE', function (data) {
+            console.log(data);
+            var scoreAudio = document.getElementById('audioContainer');
+            playSoundQueue(scoreAudio, data);
+        });
 
         function activate() {
-            //Hack for now to allow data service to retrieve games
+            //Hack for now to allow data service time to retrieve games
             $timeout(function() {
                 logger.info('Activated Dashboard View');
                 updateActiveGamesText();
                 updateNFLGamesCollection();
                 // updateNCFGamesCollection();
             }, 1000);
+        }
+        
+        // The following function is used from: http://stackoverflow.com/a/16917814
+        function playSoundQueue (container, files) {
+            var index = 1;
+            if (!container || !container.tagName || container.tagName !== 'AUDIO') {
+                throw 'Invalid container';
+            }
+            if (!files || !files.length) {
+                throw 'Invalid files array';
+            }        
+        
+            var playNext = function() {
+                if (index < files.length) {
+                    container.src = files[index];
+                    index += 1;
+                } else {
+                    container.removeEventListener('ended', playNext, false);
+                }
+            };
+        
+            container.addEventListener('ended', playNext);
+        
+            container.src = files[0];
         }
 
         function retrieveActiveGamesCount() {
