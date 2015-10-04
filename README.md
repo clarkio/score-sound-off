@@ -5,10 +5,9 @@ An Angular/Node.js project for providing latest game scores and audible announce
 >Generated from HotTowel Angular
 
 TODO:
-* Finish parsing the game data (using NFL for now)
-    - Note: completed games are displayed as `FINAL`, `END OF 4TH`, or `00:00 IN 4TH`
-    - Make sure to account for ties
-* Fix binding to response data in dashboard view
+* Highlight game that just had a score change
+* Make it easier to modify/generate the test data
+* Write some unit tests yo! so you don't have to manually test anymore
 
 >*Opinionated Angular style guide for teams by [@john_papa](//twitter.com/john_papa)*
 
@@ -20,8 +19,6 @@ TODO:
  - on OSX use [homebrew](http://brew.sh) `brew install node`
  - on Windows use [chocolatey](https://chocolatey.org/) `choco install nodejs`
 
-2. Install Yeoman `npm install -g yo`
-
 3. Install these NPM packages globally
 
     ```bash
@@ -30,7 +27,7 @@ TODO:
 
     >Refer to these [instructions on how to not require sudo](https://github.com/sindresorhus/guides/blob/master/npm-global-without-sudo.md)
 
-## Running HotTowel
+## Running Score Sound Off
 
 ### Linting
  - Run code analysis using `gulp vet`. This runs jshint, jscs, and plato.
@@ -39,9 +36,12 @@ TODO:
  - Run the unit tests using `gulp test` (via karma, mocha, sinon).
 
 ### Running in dev mode
+ - Choose whether you want to use the test data or live data (this is off by default right now)
+    - To toggle whether test or live data is used edit variable `useTestData` in the file `src/server/scores-service.js` on line 29.
+    > When using live data you should be aware of the interval at which you're pulling that data from the source. By default the data will be requested every 30 seconds.
  - Run the project with `gulp serve-dev`
 
- - opens it in a browser and updates the browser with any files changes.
+ - This opens the web app in a browser and updates the browser with any files changes.
 
 ### Building the project
  - Build the optimized project using `gulp build`
@@ -50,69 +50,15 @@ TODO:
 ### Running the optimized code
  - Run the optimize project from the build folder with `gulp serve-build`
 
-## Exploring HotTowel
-HotTowel Angular starter project
-
-### Structure
-The structure also contains a gulpfile.js and a server folder. The server is there just so we can serve the app using node. Feel free to use any server you wish.
-
-	/src
-		/client
-			/app
-			/content
-
-### Installing Packages
-When you generate the project it should run these commands, but if you notice missing packages, run these again:
-
- - `npm install`
- - `bower install`
-
-### The Modules
-The app has 4 feature modules and depends on a series of external modules and custom but cross-app modules
-
-```
-app --> [
-        app.admin --> [
-            app.core,
-            app.widgets
-        ],
-        app.dashboard --> [
-            app.core,
-            app.widgets
-        ],
-        app.layout --> [
-            app.core
-        ],
-        app.widgets,
-		app.core --> [
-			ngAnimate,
-			ngSanitize,
-			ui.router,
-			blocks.exception,
-			blocks.logger,
-			blocks.router
-		]
-    ]
-```
-
-#### core Module
-Core modules are ones that are shared throughout the entire application and may be customized for the specific application. Example might be common data services.
-
-This is an aggregator of modules that the application will need. The `core` module takes the blocks, common, and Angular sub-modules as dependencies.
-
-#### blocks Modules
-Block modules are reusable blocks of code that can be used across projects simply by including them as dependencies.
-
-##### blocks.logger Module
-The `blocks.logger` module handles logging across the Angular app.
-
-##### blocks.exception Module
-The `blocks.exception` module handles exceptions across the Angular app.
-
-It depends on the `blocks.logger` module, because the implementation logs the exceptions.
-
-##### blocks.router Module
-The `blocks.router` module contains a routing helper module that assists in adding routes to the $routeProvider.
+### Modifying Data Retrieval Interval
+ - Open `src/server/app.js` and change the value of `intervalInSeconds` on line 35.
+ > When using live data you should be aware of the interval at which you're pulling that data from the source. By default the data will be requested every 30 seconds.
+ 
+### Modifying Test Data
+ - Open `src/server/test-helpers/test-data-bottomline.json` and you'll see an `nfl` property with a long string as its value.
+    - In the string you should see all mock NFL games for one week in a url-encoded format. This is the format used in the source system that the data is retrieved from.
+ - Find a game you want to change in the url-encoded string.
+ - Change a team's score by modifying the value between the `%20` just after the team's name.
 
 ## Gulp Tasks
 
