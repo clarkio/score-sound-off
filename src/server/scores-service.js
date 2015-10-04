@@ -19,16 +19,11 @@ var leagues = {
     collegeBasketball: 'ncb'
 };
 
-var nflEventData = {};
-var ncfEventData = {};
-
 module.exports = {
     sport: sport,
     leagues: leagues,
     retrieveSportsData: retrieveSportsDataFromBottomline,
-    testRetrieveSportsData: retrieveSportsDataFromApi,
-    nflGames: nflEventData,
-    ncfGames: ncfEventData
+    testRetrieveSportsData: retrieveSportsDataFromApi
 };
 
 var useTestData = true;
@@ -39,12 +34,7 @@ var trailingScoresUrl = '/bottomline/scores';
 
 //http://site.api.espn.com/apis/v2/scoreboard/header?sport=football&league=nfl
 
-function getNflData () {
-    return Promise.resolve(nflEventData);
-}
-
 function retrieveSportsDataFromBottomline(sportType) {
-    // console.log('Sport Requested: ', sport);
     if (useTestData) {
         console.log('USING TEST DATA');
         return retrieveTestData(sportType);
@@ -55,70 +45,43 @@ function retrieveSportsDataFromBottomline(sportType) {
     return request(baseScoresUrl + sportType + trailingScoresUrl)
                 .spread(readBottomlineScoresData)
                 .catch(handleError);
-    
-    function readBottomlineScoresData (response, body) {
-        return bottomlineScoreParser.parseScores(body, leagues.nfl)
-                .then(function (result) {
-                    if (sportType === leagues.nfl) {
-                        nflEventData = result;
-                        data.nflGameData = result;
-                    } else {
-                        ncfEventData = result;
-                        data.ncfGameData = result;
-                    }
-                    // data.setNflGames(result);
-                    // console.log('Latest data:', nflEventData);
-                    return Promise.resolve(result);
-                })
-                .catch(function (error) {
-                    console.log('Error getting latest data:', error);
-                    return Promise.reject(error);
-                });
-    };
 }
 
 function retrieveSportsDataFromApi (sport, league) {
-}
-
-function handleError(e) {
-    console.log('An error occurred:', e);
-    return Promise.reject(e);
+    // TODO
 }
 
 function retrieveTestData (sportType) {
     var fs = Promise.promisifyAll(require('fs'));
     return fs.readFileAsync('src/server/test-helpers/test-data-bottomline.json', 'utf8')
-        .then(function (data) {
-            data = JSON.parse(data);
-            return readBottomlineScoresData({}, data[sportType]);
-        })
-        .catch(function (error) {
-            console.log(error);
-            return error;
-        });
+        .then(successFn)
+        .catch(handleError);
         
-    function readBottomlineScoresData (response, body) {
-        return bottomlineScoreParser.parseScores(body, leagues.nfl)
-                .then(function (result) {
-                    if (sportType === leagues.nfl) {
-                        nflEventData = result;
-                        data.nflGameData = result;
-                    } else {
-                        ncfEventData = result;
-                        data.ncfGameData = result;
-                    }
-                    // data.setNflGames(result);
-                    // console.log('Latest data:', nflEventData);
-                    return Promise.resolve(result);
-                })
-                .catch(function (error) {
-                    console.log('Error getting latest data:', error);
-                    return Promise.reject(error);
-                });
-    };
+    function successFn (data) {
+        data = JSON.parse(data);
+        return readBottomlineScoresData({}, data[sportType]);
+    }
 }
 
-function repeatUpdateOfScores() {
-    console.log('update in progress');
-    setInterval(retrieveSportsDataFromBottomline('nfl'), 5000);
+function readBottomlineScoresData (response, body) {
+    return bottomlineScoreParser.parseScores(body, leagues.nfl)
+            .then(successFn)
+            .catch(errorFn);
+    
+    function successFn (result) {
+        return Promise.resolve(result);
+    }
+                    
+    function errorFn (error) {
+        return handleError (error, 'Error getting latest data')
+    }
+}
+
+function handleError(error, overrideMessage) {
+    var message = overrideMessage;
+    if (!overrideMessage) {
+        message = 'An error occured';
+    }
+    console.log(message + ':', error);
+    return Promise.reject(error);
 }
