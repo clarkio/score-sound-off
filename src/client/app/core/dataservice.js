@@ -25,7 +25,9 @@
 
         function getMessageCount() { return $q.when(72); }
         
-        function retrieveActiveGamesCount() { return $q.when(service.totalNFLActiveGamesCount && service.totalNCFActiveGamesCount); }
+        function retrieveActiveGamesCount() { 
+            return $q.when(service.totalNFLActiveGamesCount && service.totalNCFActiveGamesCount); 
+        }
         
         function retrieveNFLGames() {
             return $http.get('/api/nfl/games')
@@ -38,8 +40,7 @@
                 service.totalNFLActiveGamesCount = response.data.reduce(function(n, game) {
                     return n + (game.status === 'in');
                 }, 0);
-                service.nflGames = response.data;
-                console.log(service.nflGames);
+                service.nflGames = response.data
                 return response.data;
             }
             
