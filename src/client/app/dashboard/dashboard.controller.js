@@ -140,7 +140,7 @@
         }
 
         function errorFunction (error) {
-            console.log('chintan',error);
+            console.log(error);
         }
     }
 })();
