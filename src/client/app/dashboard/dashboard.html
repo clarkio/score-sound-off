@@ -7,7 +7,15 @@
                         <li class="borange">
                             <div class="pull-left"><i class="fa fa-envelope"></i></div>
                             <div class="datas-text pull-right">
-                                <span class="bold">{{vm.activeNflGamesCount}}</span> {{vm.activeNflGamesText}}
+                                <span class="bold">{{vm.activeNflGamesCount}}</span>{{ vm.nflGames.y }} {{ vm.nflGames.t
+                                }} {{vm.activeNflGamesText}}
+                                <div>(<ng-pluralize count="vm.nflGames.w"
+                                            when="
+                                            {'1': '1st',
+                                             '2': '2nd',
+                                             '3': '3rd',
+                                             'other': '{}th'
+                                            }"></ng-pluralize> Week)</div>
                             </div>
                             <div class="clearfix"></div>
                         </li>
@@ -21,10 +29,10 @@
                     </ul>
                 </div>
             </div>
-            <div class="row"><div class="col-md-6">
+            <div class="row">
+                <div class="col-md-10">
                     <div class="widget wblue">
-                        <div ht-widget-header title="NFL Games"
-                             allow-collapse="true"></div>
+                        <div ht-widget-header title="NFL Games" allow-collapse="true"></div>
                         <div class="widget-content text-center text-info">
                             <table class="table table-condensed table-striped">
                                 <thead>
@@ -34,34 +42,33 @@
                                         <th>Home Team</th>
                                         <th>Score</th>
                                         <th>Status</th>
-                                        <!--<th>Quarter</th>-->
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="g in vm.nflGames">
-                                        <td>{{g.competitors[1].name}}</td>
-                                        <td>{{g.competitors[1].score}}</td>
-                                        <td>{{g.competitors[0].name}}</td>
-                                        <td>{{g.competitors[0].score}}</td>
-                                        <td>{{g.summary}}</td>
-                                        <!--<td>{{g.clock}}</td>
-                                        <td>{{g.period}}</td>-->
+                                    <tr ng-repeat="g in vm.nflGames.gms">
+                                        <td ng-class="{bgreen: (g.vs > g.hs)}">{{g.v}} {{g.vnn}}</td>
+                                        <td ng-class="{bgreen: (g.vs > g.hs)}">{{g.vs}}</td>
+                                        <td ng-class="{bgreen: (g.hs > g.vs)}">{{g.h}} {{g.hnn}}</td>
+                                        <td ng-class="{bgreen: (g.hs > g.vs)}">{{g.hs}}</td>
+                                        <td ng-if="g.q === 'F'">
+                                            Final</td>
+                                        <td ng-if="g.q === 'FO'">
+                                            Final (OT)</td>
+                                        <td ng-if="g.q === 'P'">Scheduled on {{g.d}} {{g.t}} pm</td>
+                                        <td ng-if="g.q !== 'F' && g.q !== 'FO' && g.q !=='P'">
+                                            <ng-pluralize count="g.q"
+                                            when="
+                                            {'1': '1st',
+                                             '2': '2nd',
+                                             '3': '3rd',
+                                             'other': '{}th'
+                                            }"></ng-pluralize> Quarter</td>
                                     </tr>
                                 </tbody>
-                                <!--<tbody>
-                                    <tr ng-repeat="g in vm.nflGames">
-                                        <td>
-                                            <table>
-                                                <td>
-                                            {{g.id}}</td>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </tbody>-->
                             </table>
                         </div>
                         <div class="widget-foot">
-                                <div class="clearfix pull-right">Last Update At: <span>{{vm.lastUpdatedNflScoresTime | amDateFormat:'MM/DD/YYYY, h:mm:ss a'}}</span></div>
+                            <div class="clearfix pull-right">Last Update At: <span>{{vm.lastUpdatedNflScoresTime | amDateFormat:'MM/DD/YYYY, h:mm:ss a'}}</span></div>
                             <div class="clearfix"></div>
                         </div>
                     </div>
@@ -69,10 +76,10 @@
                 <div class="col-md-6">
                 </div>
             </div>
-            <div class="row"><div class="col-md-6" ng-show="false">
+            <div class="row">
+                <div class="col-md-6" ng-show="false">
                     <div class="widget wblue">
-                        <div ht-widget-header title="College Football Games"
-                             allow-collapse="true"></div>
+                        <div ht-widget-header title="College Football Games" allow-collapse="true"></div>
                         <div class="widget-content text-center text-info">
                             <table class="table table-condensed table-striped">
                                 <thead>
@@ -109,7 +116,7 @@
                             </table>
                         </div>
                         <div class="widget-foot">
-                                <div class="clearfix pull-right">Last Update At: <span>{{vm.lastUpdatedNcfScoresTime | amDateFormat:'MM/DD/YYYY, h:mm:ss a'}}</span></div>
+                            <div class="clearfix pull-right">Last Update At: <span>{{vm.lastUpdatedNcfScoresTime | amDateFormat:'MM/DD/YYYY, h:mm:ss a'}}</span></div>
                             <div class="clearfix"></div>
                         </div>
                     </div>

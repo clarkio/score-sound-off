@@ -26,7 +26,8 @@ module.exports = {
     testRetrieveSportsData: retrieveSportsDataFromApi
 };
 
-var useTestData = true;
+var useTestData = false;
+var nflScoresUrl = 'http://www.nfl.com/liveupdate/scorestrip/ss.json';
 var baseScoresUrl = 'http://sports.espn.go.com/';
 var trailingScoresUrl = '/bottomline/scores';
 // var baseScoresApiUrl = 'http://site.api.espn.com/apis/v2/scoreboard/';
@@ -42,38 +43,51 @@ function retrieveSportsDataFromBottomline(sportType) {
         console.log('USING LIVE DATA');
     }
     // From Bluebird: if a module has multiple success values use .spread instead of .then
-    return request(baseScoresUrl + sportType + trailingScoresUrl)
-                .spread(readBottomlineScoresData)
-                .catch(handleError);
+    if (sportType === leagues.nfl) {
+        return request(nflScoresUrl)
+            .then(nflScoreSuccess)
+            .catch(handleError);
+
+    }
+    else {
+        return request(baseScoresUrl + sportType + trailingScoresUrl)
+            .spread(readBottomlineScoresData)
+            .catch(handleError);
+    }
+    function nflScoreSuccess(result) {
+        return Promise.resolve(JSON.parse(result[1]));
+    }
 }
 
-function retrieveSportsDataFromApi (sport, league) {
+
+
+function retrieveSportsDataFromApi(sport, league) {
     // TODO
 }
 
-function retrieveTestData (sportType) {
+function retrieveTestData(sportType) {
     var fs = Promise.promisifyAll(require('fs'));
     return fs.readFileAsync('src/server/test-helpers/test-data-bottomline.json', 'utf8')
         .then(successFn)
         .catch(handleError);
-        
-    function successFn (data) {
+
+    function successFn(data) {
         data = JSON.parse(data);
         return readBottomlineScoresData({}, data[sportType]);
     }
 }
 
-function readBottomlineScoresData (response, body) {
+function readBottomlineScoresData(response, body) {
     return bottomlineScoreParser.parseScores(body, leagues.nfl)
-            .then(successFn)
-            .catch(errorFn);
-    
-    function successFn (result) {
+        .then(successFn)
+        .catch(errorFn);
+
+    function successFn(result) {
         return Promise.resolve(result);
     }
-                    
-    function errorFn (error) {
-        return handleError (error, 'Error getting latest data');
+
+    function errorFn(error) {
+        return handleError(error, 'Error getting latest data');
     }
 }
 

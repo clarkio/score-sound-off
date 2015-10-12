@@ -54,12 +54,12 @@ function checkNflScores () {
         .then(function (result) {
             var scoreChanges = scoreCalculator.determineScoreChanges(gameData, result);
             var scoreChangeAudio;
-            if (scoreChanges && scoreChanges.length > 0) {
+            if (scoreChanges && scoreChanges.length === 0) {
                 gameData = result;
                 io.emit('NFL-ALL-UPDATE', result);
                 scoreChangeAudio = scoreAudio.determineScoreChangeAudio(scoreChanges);
             }
-            if (scoreChangeAudio && scoreChangeAudio.length > 0) {
+            if (scoreChangeAudio && scoreChangeAudio.length === 0) {
                 io.emit('NFL-SCORE-CHANGE', scoreChangeAudio);
             }
             console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': end update of NFL data', '\n----------');
@@ -116,7 +116,7 @@ switch (environment){
         // });
         // Any deep link calls should return index.html
         // app.use('/*', express.static('./src/client/index.html'));
-        // app.use('/socket.io/*', 
+        // app.use('/socket.io/*',
         //     express.static('./node_modules/socket.io/node_modules/socket.io-client/socket.io.js'))
         break;
 }
