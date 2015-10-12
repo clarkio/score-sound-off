@@ -55,13 +55,13 @@ function checkNflScores () {
             var scoreChanges = scoreCalculator.determineScoreChanges(gameData, result);
             var scoreChangeAudio;
             console.log('Score changed:' + scoreChanges);
-            if (scoreChanges && scoreChanges.length > 0) {
+            if (scoreChanges) {
                 gameData = result;
                 io.emit('NFL-ALL-UPDATE', result);
                 scoreChangeAudio = scoreAudio.determineScoreChangeAudio(scoreChanges);
             }
             console.log('scoreChangeAudio changed:' + scoreChangeAudio);
-            if (scoreChangeAudio && scoreChangeAudio.length > 0) {
+            if (scoreChangeAudio) {
                 io.emit('NFL-SCORE-CHANGE', scoreChangeAudio);
             }
             console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': end update of NFL data', '\n----------');
