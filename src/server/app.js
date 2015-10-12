@@ -54,12 +54,14 @@ function checkNflScores () {
         .then(function (result) {
             var scoreChanges = scoreCalculator.determineScoreChanges(gameData, result);
             var scoreChangeAudio;
-            if (scoreChanges && scoreChanges.length === 0) {
+            console.log('Score changed:' + scoreChanges);
+            if (scoreChanges && scoreChanges.length > 0) {
                 gameData = result;
                 io.emit('NFL-ALL-UPDATE', result);
                 scoreChangeAudio = scoreAudio.determineScoreChangeAudio(scoreChanges);
             }
-            if (scoreChangeAudio && scoreChangeAudio.length === 0) {
+            console.log('scoreChangeAudio changed:' + scoreChangeAudio);
+            if (scoreChangeAudio && scoreChangeAudio.length > 0) {
                 io.emit('NFL-SCORE-CHANGE', scoreChangeAudio);
             }
             console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': end update of NFL data', '\n----------');
