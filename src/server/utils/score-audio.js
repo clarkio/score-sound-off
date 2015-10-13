@@ -1,47 +1,81 @@
 
 var util = require('util');
+var fs = require('fs');
+var Promise = require('bluebird');
+var _ = require('lodash');
 
 module.exports = {
     determineScoreChangeAudio: determineAllScoreChangeAudio
 };
 
-function determineAllScoreChangeAudio (scoreChanges) {
-    var allAudioFilesToPlay = [];
+function determineAllScoreChangeAudio(scoreChanges) {
+    var audioPromises = [];
     for (var i = 0; i < scoreChanges.length; i++) {
-        var gameScoreChangeAudio = determineScoreChangeAudio(scoreChanges[i]);
-        allAudioFilesToPlay.push.apply(allAudioFilesToPlay, gameScoreChangeAudio);
+        var audioPromise = determineScoreChangeAudio(scoreChanges[i]);
+        audioPromises.push(audioPromise);
     }
-    return allAudioFilesToPlay;
+    console.log(audioPromises.length);
+    return Promise.all(audioPromises)
+        .then(function (result) {
+            console.log(result[0]);
+            return result[0];
+        })
+        .catch(function (err) {
+            console.log("determineAllScoreChangeAudio", err);
+        });
 }
 
-function determineScoreChangeAudio (scoreChange) {
+function determineScoreChangeAudio(scoreChange) {
     // TODO: make it configurable what voice is used
     var audioFileMainUrl = 'http://www.myfantasyleague.com/sounds/shouty/';
     var audioFilesToPlay = [];
-    var teamCityToPlay = getTeamCityAudioFile(scoreChange);
-    var teamScoreToPlay = getTeamScoreChangeAudioFile(scoreChange);
-    var teamNameToPlay = getTeamNameAudioFile(teamCityToPlay);
-    
-    for (var i = 0; i < teamScoreToPlay.length; i++) {
-        audioFilesToPlay.push(audioFileMainUrl + teamScoreToPlay[i] + '.wav');
+    return Promise.all([
+        getTeamCityAudioFile(scoreChange),
+        getTeamScoreChangeAudioFile(scoreChange),
+        getTeamNameAudioFile(scoreChange)])
+            .then(successAudioCallback)
+            .catch(errorCallback);
+
+    function successAudioCallback(results) {
+        var teamCityToPlay = results[0].toLowerCase();
+        var teamScoreToPlay = results[1];
+        var teamNameToPlay = results[2].toLowerCase();
+        for (var i = 0; i < teamScoreToPlay.length; i++) {
+            audioFilesToPlay.push(audioFileMainUrl + teamScoreToPlay[i] + '.wav');
+        }
+        audioFilesToPlay.push(audioFileMainUrl + teamCityToPlay + teamNameToPlay + '.wav');
+        return Promise.resolve(audioFilesToPlay);
     }
-    audioFilesToPlay.push(audioFileMainUrl + teamCityToPlay + teamNameToPlay + '.wav');
-    
-    return audioFilesToPlay;
+
+    function errorCallback(err) {
+        return Promise.reject(err);
+    }
 }
 
-function getTeamCityAudioFile (scoreChange) {
+
+function getTeamCityAudioFile(scoreChange) {
     var teamCity = scoreChange.split(':')[0].toLowerCase();
-    if (teamCity.indexOf('ny ') > -1) {
-        // for new york jets and giants
-        teamCity = teamCity.replace('ny ', 'newyork');
+    return fs.readFileAsync('src/server/utils/nfl-team-mapping.json', 'utf8')
+        .then(successFn)
+        .catch(handleError);
+
+    function successFn(result) {
+        result = JSON.parse(result);
+        var team = result.filter(function (obj) {
+            return (obj && obj.abr && obj.abr.toLowerCase() === teamCity);
+        });
+        var removeSpaces = team[0].city.toLowerCase().split(" ").join("");
+        var sanitizedCityName = removeSpaces.toLowerCase().split(".").join("");
+        return Promise.resolve(sanitizedCityName);
     }
-    teamCity = teamCity.replace(' ', '');
-    teamCity = teamCity.replace('.', ''); // for St. Louis
-    return teamCity;
+
+    function handleError(err) {
+        console.log(err);
+        return Promise.resolve(err);
+    }
 }
 
-function getTeamScoreChangeAudioFile (scoreChange) {
+function getTeamScoreChangeAudioFile(scoreChange) {
     var result = [];
     var rawScoreTerm = scoreChange.split(':')[1];
     if (rawScoreTerm.indexOf('+') > -1) {
@@ -53,110 +87,6 @@ function getTeamScoreChangeAudioFile (scoreChange) {
     return result;
 }
 
-function getTeamNameAudioFile (teamCity) {
-    /*jshint maxcomplexity:33 */
-    var teamName = '';
-    var lowerCaseCityName = teamCity.toLowerCase();
-    switch (lowerCaseCityName) {
-        case 'arizona':
-            teamName = 'cardinals';
-            break;
-        case 'atlanta':
-            teamName = 'falcons';
-            break;
-        case 'baltimore':
-            teamName = 'ravens';
-            break;
-        case 'buffalo':
-            teamName = 'bills';
-            break;
-        case 'carolina':
-            teamName = 'panthers';
-            break;
-        case 'chicago':
-            teamName = 'bears';
-            break;
-        case 'cincinnati':
-            teamName = 'bengals';
-            break;
-        case 'cleveland':
-            teamName = 'browns';
-            break;
-        case 'dallas':
-            teamName = 'cowboys';
-            break;
-        case 'denver':
-            teamName = 'broncos';
-            break;
-        case 'detroit':
-            teamName = 'lions';
-            break;
-        case 'greenbay':
-            teamName = 'packers';
-            break;
-        case 'houston':
-            teamName = 'texans';
-            break;
-        case 'indianapolis':
-            teamName = 'colts';
-            break;
-        case 'jacksonville':
-            teamName = 'jaguars';
-            break;
-        case 'kansascity':
-            teamName = 'chiefs';
-            break;
-        case 'miami':
-            teamName = 'dolphins';
-            break;
-        case 'minnesota':
-            teamName = 'vikings';
-            break;
-        case 'newengland':
-            teamName = 'patriots';
-            break;
-        case 'neworleans':
-            teamName = 'saints';
-            break;
-        case 'newyorkgiants':
-            teamName = '';//already set in city parsing
-            break;
-        case 'newyorkjets':
-            teamName = '';//already set in city parsing
-            break;
-        case 'oakland':
-            teamName = 'raiders';
-            break;
-        case 'philadelphia':
-            teamName = 'eagles';
-            break;
-        case 'pittsburgh':
-            teamName = 'steelers';
-            break;
-        case 'sandiego':
-            teamName = 'chargers';
-            break;
-        case 'sanfrancisco':
-            teamName = '49ers';
-            break;
-        case 'seattle':
-            teamName = 'seahawks';
-            break;
-        case 'stlouis':
-            teamName = 'rams';
-            break;
-        case 'tampabay':
-            teamName = 'buccaneers';
-            break;
-        case 'tennessee':
-            teamName = 'titans';
-            break;
-        case 'washington':
-            teamName = 'redskins';
-            break;
-        default:
-            console.log('Team Name could not be determined for city: ', teamCity);
-            break;
-    }
-    return teamName;
+function getTeamNameAudioFile(scoreChange) {
+    return scoreChange.split(':')[2];
 }

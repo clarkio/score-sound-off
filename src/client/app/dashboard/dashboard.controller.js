@@ -43,7 +43,9 @@
         nflSocket.on('NFL-SCORE-CHANGE', function (data) {
             console.log(data);
             var scoreAudio = document.getElementById('audioContainer');
-            playSoundQueue(scoreAudio, data);
+            if(data.length){
+                playSoundQueue(scoreAudio, data);
+            }
         });
 
         function activate() {
@@ -62,9 +64,9 @@
             if (!container || !container.tagName || container.tagName !== 'AUDIO') {
                 throw Error( 'Invalid container' );
             }
-           /* if (!files || !files.length) {
+            if (!files || !files.length) {
                 throw Error( 'Invalid files array' );
-            }*/
+            }
 
             var playNext = function() {
                 if (index < files.length) {

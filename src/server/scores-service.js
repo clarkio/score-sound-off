@@ -67,13 +67,18 @@ function retrieveSportsDataFromApi(sport, league) {
 
 function retrieveTestData(sportType) {
     var fs = Promise.promisifyAll(require('fs'));
-    return fs.readFileAsync('src/server/test-helpers/test-data-bottomline.json', 'utf8')
+    return fs.readFileAsync('src/server/test-helpers/nfl-livescore.json', 'utf8')
         .then(successFn)
         .catch(handleError);
 
     function successFn(data) {
         data = JSON.parse(data);
-        return readBottomlineScoresData({}, data[sportType]);
+        if (sportType === leagues.nfl) {
+            return Promise.resolve(data);
+        }
+        else {
+            return readBottomlineScoresData({}, data);
+        }
     }
 }
 
