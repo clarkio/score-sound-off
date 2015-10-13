@@ -46,10 +46,10 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="g in vm.nflGames.gms">
-                                        <td ng-class="{bgreen: (g.vs > g.hs)}">{{g.v}} {{g.vnn}}</td>
-                                        <td ng-class="{bgreen: (g.vs > g.hs)}">{{g.vs}}</td>
-                                        <td ng-class="{bgreen: (g.hs > g.vs)}">{{g.h}} {{g.hnn}}</td>
-                                        <td ng-class="{bgreen: (g.hs > g.vs)}">{{g.hs}}</td>
+                                        <td ng-class="{bblue: (g.vs > g.hs)}">{{g.v}} {{g.vnn}}</td>
+                                        <td>{{g.vs}}</td>
+                                        <td ng-class="{bblue: (g.hs > g.vs)}">{{g.h}} {{g.hnn}}</td>
+                                        <td>{{g.hs}}</td>
                                         <td ng-if="g.q === 'F'">
                                             Final</td>
                                         <td ng-if="g.q === 'FO'">
