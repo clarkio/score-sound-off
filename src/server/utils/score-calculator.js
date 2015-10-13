@@ -22,19 +22,33 @@ function determineScoreChanges (originalScores, newScores) {
     var fullScoreChanges = [];
     console.log('The difference found:', util.inspect(result, false, null));
     if (result) {
-        _.forEach(result, function (scoreDiffValue, key) {
+        _.forEach(result.gms, function (scoreDiffValue, key) {
             // Ignore the jsondiffpatch libraries '_t' notation/object
             if (key !== '_t') {
-                checkAndPushScoreChangeForCompetitor(0, scoreDiffValue, newScores, key, fullScoreChanges);
-                checkAndPushScoreChangeForCompetitor(1, scoreDiffValue, newScores, key, fullScoreChanges);
-                console.log(fullScoreChanges);
+                var score = checkAndPushScoreChange(key, scoreDiffValue,originalScores);
+                if(score) {
+                    fullScoreChanges.push(score);
+                }
+                //checkAndPushScoreChangeForCompetitor(0, scoreDiffValue, newScores, key, fullScoreChanges);
+                //checkAndPushScoreChangeForCompetitor(1, scoreDiffValue, newScores, key, fullScoreChanges);
             }
         });
     } else {
         console.log('No score changes found');
     }
-    
     return fullScoreChanges;
+}
+
+function checkAndPushScoreChange(key,differenceValue,originalScores) {
+    var scoreChange;
+    if(differenceValue.vs) {
+        scoreChange = originalScores.gms[key].v + ":" + getScoreDifferenceTerm(differenceValue.vs[0], differenceValue.vs[1]) + ":" +  originalScores.gms[key].vnn;
+
+    }
+    if(differenceValue.hs) {
+        scoreChange = originalScores.gms[key].h + ":" + getScoreDifferenceTerm(differenceValue.hs[0], differenceValue.hs[1]) + ":" + originalScores.gms[key].hnn;
+    }
+    return scoreChange;
 }
 
 function checkAndPushScoreChangeForCompetitor (competitor, scoreDiff, newScores, key, fullScoreChanges) {
@@ -62,18 +76,18 @@ function getScoreDifferenceTerm (oldScore, newScore) {
     var scoreTerm;
     if (diff > 0) {
         switch (diff) {
-            case 6:
-                scoreTerm = 'touchdown';
-                break;
             case 1:
                 scoreTerm = 'extrapoint';
-                break;
-            case 3:
-                scoreTerm = 'fieldgoal';
                 break;
             case 2:
                 // TODO: need to determine if it's 2 point conversion somehow
                 scoreTerm = 'safety';
+                break;
+            case 3:
+                scoreTerm = 'fieldgoal';
+                break;
+            case 6:
+                scoreTerm = 'touchdown';
                 break;
             case 7:
                 scoreTerm = 'touchdown+extrapoint';
@@ -87,6 +101,6 @@ function getScoreDifferenceTerm (oldScore, newScore) {
                 break;
         }
     }
-    
+
     return scoreTerm;
 }

@@ -24,36 +24,36 @@
         return service;
 
         function getMessageCount() { return $q.when(72); }
-        
-        function retrieveActiveGamesCount() { 
-            return $q.when(service.totalNFLActiveGamesCount && service.totalNCFActiveGamesCount); 
+
+        function retrieveActiveGamesCount() {
+            return $q.when(service.totalNFLActiveGamesCount && service.totalNCFActiveGamesCount);
         }
-        
+
         function retrieveNFLGames() {
             return $http.get('/api/nfl/games')
                 .then(success)
                 .catch(fail);
-                
+
             function success(response) {
                 console.log(response.data);
-                service.totalNFLGamesCount = response.data.length;
-                service.totalNFLActiveGamesCount = response.data.reduce(function(n, game) {
-                    return n + (game.status === 'in');
+                service.totalNFLGamesCount = response.data.gms.length;
+                service.totalNFLActiveGamesCount = response.data.gms.reduce(function(n, game) {
+                    return n + (game.q !== 'F' && game.q !== 'FO' && game.q !== 'P');
                 }, 0);
                 service.nflGames = response.data;
                 return response.data;
             }
-            
+
             function fail(e) {
                 return exception.catcher('XHR Failed for retrieveNFLGames')(e);
             }
         }
-        
+
         function retrieveNCFGames() {
             return $http.get('/api/ncf/games')
                 .then(success)
                 .catch(fail);
-                
+
             function success(response) {
                 console.log(response.data);
                 service.totalNCFGamesCount = response.data.length;
@@ -64,7 +64,7 @@
                 console.log(service.ncfGames);
                 return response.data;
             }
-            
+
             function fail(e) {
                 return exception.catcher('XHR Failed for retrieveNFLGames')(e);
             }
