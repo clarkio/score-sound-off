@@ -1,5 +1,5 @@
 /* jshint -W117, -W030 */
-describe('ShellController', function() {
+describe.skip('ShellController', function() {
     var controller;
 
     beforeEach(function() {

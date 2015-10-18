@@ -49,10 +49,11 @@ function checkAndPushScoreChangeForCompetitor (competitor, scoreDiff, newScores,
         console.log('competitor ' + competitor + ' score change');
         teamName = newScores[key].competitors[competitor].name;
         scoreChange = getScoreDifferenceTerm(team.score[0], team.score[1]);
-    }
-    if (scoreChange) {
-        fullScoreChange = teamName + ':' + scoreChange;
-        fullScoreChanges.push(fullScoreChange);
+        
+        if (scoreChange) {
+            fullScoreChange = teamName + ':' + scoreChange;
+            fullScoreChanges.push(fullScoreChange);
+        }
     }
 }
 
