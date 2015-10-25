@@ -26,6 +26,7 @@
         vm.updateNcfScores = updateNcfScores;
         vm.lastUpdatedNflScoresTime = new Date();
         vm.lastUpdatedNcfScoresTime = new Date();
+        vm.selectedVoice = 'shouty';
 
         activate();
         
@@ -43,6 +44,7 @@
         nflSocket.on('NFL-SCORE-CHANGE', function (data) {
             console.log(data);
             var scoreAudio = document.getElementById('audioContainer');
+            checkVoice(data);
             playSoundQueue(scoreAudio, data);
         });
 
@@ -78,6 +80,16 @@
             container.addEventListener('ended', playNext);
         
             container.src = files[0];
+        }
+        
+        function checkVoice (data) {
+            if (vm.selectedVoice !== 'shouty') {
+                data.forEach(function (item, index) {
+                    if (item.indexOf('shouty') > -1) {
+                        data[index] = item.replace('shouty', vm.selectedVoice);
+                    }
+                });
+            }
         }
 
         function retrieveActiveGamesCount() {
