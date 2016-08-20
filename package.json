@@ -75,7 +75,7 @@
     "minimist": "^1.1.0",
     "mocha": "^2.2.5",
     "node-notifier": "^4.0.3",
-    "phantomjs": "^1.9.17",
+    "phantomjs": "^2.0.0",
     "plato": "^1.2.0",
     "q": "^1.0.1",
     "sinon": "^1.12.2",
