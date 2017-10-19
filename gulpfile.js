@@ -431,7 +431,7 @@ function orderSrc (src, order) {
  * @param  {Boolean} specRunner - server spec runner html
  */
 function serve(isDev, specRunner) {
-    var debugMode = '--debug';
+    var debugMode = '--inspect';
     var nodeOptions = getNodeOptions(isDev);
 
     nodeOptions.nodeArgs = [debugMode + '=5858'];
