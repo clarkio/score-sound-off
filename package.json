@@ -6,7 +6,9 @@
     "init": "npm install",
     "install": "bower install",
     "start": "node src/server/app.js",
-    "test": "gulp test"
+    "test": "snyk test && gulp test",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "dependencies": {
     "bluebird": "^2.10.0",
@@ -18,7 +20,8 @@
     "morgan": "^1.1.1",
     "request": "^2.61.0",
     "serve-favicon": "^2.0.1",
-    "socket.io": "^1.4.8"
+    "socket.io": "^2.0.2",
+    "snyk": "^1.43.0"
   },
   "devDependencies": {
     "browser-sync": "^2.7.13",
@@ -82,5 +85,6 @@
     "sinon-chai": "^2.6.0",
     "wiredep": "^2.2.2",
     "yargs": "^3.15.0"
-  }
+  },
+  "snyk": true
 }

@@ -26,7 +26,7 @@ module.exports = {
     testRetrieveSportsData: retrieveSportsDataFromApi
 };
 
-var useTestData = false;
+var useTestData = true;
 var baseScoresUrl = 'http://sports.espn.go.com/';
 var trailingScoresUrl = '/bottomline/scores';
 // var baseScoresApiUrl = 'http://site.api.espn.com/apis/v2/scoreboard/';

@@ -1,4 +1,5 @@
 # score-sound-off
+[![Known Vulnerabilities](https://snyk.io/test/github/clarkio/score-sound-off/badge.svg)](https://snyk.io/test/github/clarkio/score-sound-off)
 
 An Angular/Node.js project for providing latest game scores and audible announcements of scoring events.
 
@@ -53,7 +54,7 @@ TODO:
 ### Modifying Data Retrieval Interval
  - Open `src/server/app.js` and change the value of `intervalInSeconds` on line 35.
  > When using live data you should be aware of the interval at which you're pulling that data from the source. By default the data will be requested every 30 seconds.
- 
+
 ### Modifying Test Data
  - Open `src/server/test-helpers/test-data-bottomline.json` and you'll see an `nfl` property with a long string as its value.
     - In the string you should see all mock NFL games for one week in a url-encoded format. This is the format used in the source system that the data is retrieved from.

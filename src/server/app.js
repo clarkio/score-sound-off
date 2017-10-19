@@ -1,4 +1,5 @@
 /*jshint node:true*/
+debugger;
 'use strict';
 
 var express = require('express');
@@ -33,7 +34,7 @@ io.on('connection', function (socket) {
 app.use('/api', require('./routes'));
 
 var scoresService = require('./scores-service');
-var intervalInSeconds = 30;
+var intervalInSeconds = 1;
 var endInterval = false;
 var gameData = [];
 
@@ -55,19 +56,19 @@ function checkNflScores () {
         .then(function (result) {
             var scoreChanges = scoreCalculator.determineScoreChanges(gameData, result);
             var scoreChangeAudio;
-            
+
             if (scoreChanges && scoreChanges.length > 0) {
                 gameData = result;
                 io.emit('NFL-ALL-UPDATE', result);
                 scoreChangeAudio = scoreAudio.determineScoreChangeAudio(scoreChanges);
-                
+
                 if (scoreChangeAudio && scoreChangeAudio.length > 0) {
                     io.emit('NFL-SCORE-CHANGE', scoreChangeAudio);
                 }
             }
-            
+
             console.log(moment().format('MM-DD-YYYY h:mm:ss:SSS a') + ': end update of NFL data', '\n----------');
-            
+
             if (endInterval) {
                 clearInterval(scoresUpdateIntervalId);
             }

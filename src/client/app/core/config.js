@@ -14,7 +14,7 @@
 
     var config = {
         appErrorPrefix: '[score-sound-off Error] ',
-        appTitle: 'Score Sound Off'
+        appTitle: 'Score Sound-Off'
     };
 
     core.value('config', config);
