@@ -16,12 +16,12 @@
     "express": "^4.14.0",
     "jsondiffpatch": "^0.1.43",
     "lodash": "^3.10.1",
-    "moment": "^2.10.6",
+    "moment": "^2.19.3",
     "morgan": "^1.1.1",
     "request": "^2.61.0",
     "serve-favicon": "^2.0.1",
-    "socket.io": "^2.0.2",
-    "snyk": "^1.43.0"
+    "snyk": "^1.43.0",
+    "socket.io": "^2.0.2"
   },
   "devDependencies": {
     "browser-sync": "^2.7.13",
