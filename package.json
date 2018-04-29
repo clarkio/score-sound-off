@@ -15,7 +15,11 @@
     "body-parser": "^1.8.2",
     "express": "^4.14.0",
     "jsondiffpatch": "^0.1.43",
+<<<<<<< HEAD
     "lodash": "^3.10.1",
+=======
+    "lodash": "^4.17.5",
+>>>>>>> 5815e277407e383ad4ed8aeb1499b069f9f0ebb5
     "moment": "^2.19.3",
     "morgan": "^1.1.1",
     "request": "^2.61.0",
