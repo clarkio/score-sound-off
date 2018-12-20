@@ -1,4 +1,8 @@
 # score-sound-off
+## ** DEPRECATED **
+
+This project has been deprecated and archived. This means that no issues, PRs or other maintenance actions will be performed on it.
+
 [![Known Vulnerabilities](https://snyk.io/test/github/clarkio/score-sound-off/badge.svg)](https://snyk.io/test/github/clarkio/score-sound-off)
 
 An Angular/Node.js project for providing latest game scores and audible announcements of scoring events.
