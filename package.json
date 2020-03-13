@@ -73,7 +73,7 @@
     "karma-sinon": "^1.0.3",
     "lodash": "^3.10.0",
     "method-override": "^2.3.4",
-    "minimist": "^1.1.0",
+    "minimist": "^1.2.2",
     "mocha": "^2.2.5",
     "node-notifier": "^4.0.3",
     "phantomjs": "^2.0.0",
