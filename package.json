@@ -75,7 +75,7 @@
     "method-override": "^2.3.4",
     "minimist": "^1.1.0",
     "mocha": "^2.2.5",
-    "node-notifier": "^4.0.3",
+    "node-notifier": "^8.0.1",
     "phantomjs": "^2.0.0",
     "plato": "^1.2.0",
     "q": "^1.5.1",
